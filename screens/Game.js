@@ -1,35 +1,30 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Alert } from 'react-native';
-import AnimatedButton from '../components/AnimatedButton';
 import { useNavigation } from '@react-navigation/native';
+import AnimatedButton from '../components/AnimatedButton';
 
 export default function Game() {
   const baseNumber = Math.floor(Math.random() * 100);
   const score = Math.floor(Math.random() * 100);
+  const [choice, setChoice] = useState('');
 
   const navigation = useNavigation();
 
-  const handleButtonClick = (choice) => {
-    const win =
-      (choice === 'lower' && score < baseNumber) ||
-      (choice === 'higher' && score > baseNumber);
+  useEffect(() => {
+    if (choice) {
+      const winner =
+        (choice === 'higher' && score > baseNumber) ||
+        (choice === 'lower' && baseNumber > score);
 
-    Alert.alert(`You've ${win ? 'won' : 'lost'}`, `You scored: ${score}`);
-    navigation.goBack();
-  };
+      navigation.navigate('Result', { winner });
+    }
+  }, [baseNumber, score, choice]);
 
   return (
     <View style={styles.container}>
       <Text style={styles.baseNumber}>Starting: {baseNumber}</Text>
-      <AnimatedButton
-        onPress={() => handleButtonClick('higher')}
-        action="higher"
-      />
-
-      <AnimatedButton
-        onPress={() => handleButtonClick('lower')}
-        action="lower"
-      />
+      <AnimatedButton action="higher" onPress={() => setChoice('higher')} />
+      <AnimatedButton action="lower" onPress={() => setChoice('lower')} />
     </View>
   );
 }
@@ -41,9 +36,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-
   baseNumber: {
     fontSize: 48,
     marginBottom: 30,
+  },
+  button: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    borderRadius: 15,
+    padding: 30,
+    marginVertical: 15,
+  },
+  buttonRed: {
+    backgroundColor: 'red',
+  },
+  buttonGreen: {
+    backgroundColor: 'green',
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 24,
   },
 });
